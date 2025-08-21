@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Request
-import requests
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import FileResponse, JSONResponse
+import requests, os, base64
 from github import Github
 from PIL import Image
 from io import BytesIO
@@ -9,17 +10,20 @@ from moviepy.editor import VideoFileClip
 app = FastAPI()
 
 # -------------------------------
-# CONFIGURAÇÃO (Substitua pelo seu)
+# CONFIGURAÇÕES SEGURAS (via ENV)
 # -------------------------------
-TOKEN = "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"
-REPO_OWNER = "Pecorine125"
-REPO_NAME = "WallpaperAnimes"
+TOKEN = os.environ["GITHUB_TOKEN"]
+WEBHOOK_SECRET = os.environ["WEBHOOK_SECRET"]
+ADMIN_USER = os.environ["ADMIN_USER"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
 g = Github(TOKEN)
-repo = g.get_user(REPO_OWNER).get_repo(REPO_NAME)
+repo = g.get_user("Pecorine125").get_repo("WallpaperAnimes")
 
 PASTA_ANIME = "Wallpaper Anime"
 PASTA_ANIMADO = "Wallpaper Animated"
+
+endpoint_ativo = True
 
 # -------------------------------
 # FUNÇÕES AUXILIARES
@@ -41,12 +45,28 @@ def redimensionar_video(content):
         temp_out.seek(0)
         return temp_out.read()
 
+def validar_auth(request: Request):
+    auth = request.headers.get("Authorization")
+    if auth is None or not auth.startswith("Basic "):
+        raise HTTPException(status_code=401, detail="Não autorizado")
+    decoded = base64.b64decode(auth.split(" ")[1]).decode("utf-8")
+    user, password = decoded.split(":")
+    if user != ADMIN_USER or password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Não autorizado")
+
 # -------------------------------
-# ENDPOINT
+# WEBHOOK / API
 # -------------------------------
 @app.post("/api/novo_wallpaper")
 async def novo_wallpaper(request: Request):
+    global endpoint_ativo
+    if not endpoint_ativo:
+        return JSONResponse({"status":"desativado"})
+
     data = await request.json()
+    if data.get("secret") != WEBHOOK_SECRET:
+        raise HTTPException(status_code=401, detail="Chave secreta inválida")
+
     url = data["url"]
     tipo = data["tipo"]
     number = str(data["number"])
@@ -61,18 +81,15 @@ async def novo_wallpaper(request: Request):
     arquivo_nome = f"{tipo} {number}{ext}"
     repo_path = f"{pasta}/{arquivo_nome}"
 
-    # Baixar conteúdo
     r = requests.get(url)
     r.raise_for_status()
     content = r.content
 
-    # Redimensionar
     if tipo == "Wallpaper Anime":
         content = redimensionar_imagem(content)
     else:
         content = redimensionar_video(content)
 
-    # Enviar para GitHub
     try:
         contents = repo.get_contents(repo_path)
         repo.update_file(contents.path, "Novo wallpaper", content, contents.sha)
@@ -80,3 +97,21 @@ async def novo_wallpaper(request: Request):
         repo.create_file(repo_path, "Novo wallpaper", content)
 
     return {"status":"ok"}
+
+# -------------------------------
+# TOGGLE / ATIVAR-DESATIVAR
+# -------------------------------
+@app.post("/api/toggle")
+async def toggle(request: Request):
+    validar_auth(request)
+    global endpoint_ativo
+    endpoint_ativo = not endpoint_ativo
+    return {"status": endpoint_ativo}
+
+# -------------------------------
+# DASHBOARD HTML
+# -------------------------------
+@app.get("/dashboard")
+async def serve_dashboard(request: Request):
+    validar_auth(request)
+    return FileResponse("dashboard.html")
