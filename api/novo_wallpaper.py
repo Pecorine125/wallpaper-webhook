@@ -96,22 +96,29 @@ async def novo_wallpaper(request: Request):
     except:
         repo.create_file(repo_path, "Novo wallpaper", content)
 
-    return {"status":"ok"}
+    return JSONResponse({"status":"ok"})
 
 # -------------------------------
 # TOGGLE / ATIVAR-DESATIVAR
 # -------------------------------
 @app.post("/api/toggle")
 async def toggle(request: Request):
-    validar_auth(request)
+    try:
+        validar_auth(request)
+    except HTTPException as e:
+        return JSONResponse({"status": "erro", "detail": e.detail}, status_code=401)
+
     global endpoint_ativo
     endpoint_ativo = not endpoint_ativo
-    return {"status": endpoint_ativo}
+    return JSONResponse({"status": endpoint_ativo})
 
 # -------------------------------
 # DASHBOARD HTML
 # -------------------------------
 @app.get("/dashboard")
 async def serve_dashboard(request: Request):
-    validar_auth(request)
-    return FileResponse("index.html")
+    try:
+        validar_auth(request)
+    except HTTPException as e:
+        return JSONResponse({"status": "erro", "detail": e.detail}, status_code=401)
+    return FileResponse("public/index.html")

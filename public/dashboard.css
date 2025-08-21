@@ -1,85 +1,28 @@
-/* Reset básico */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Corpo da página */
+* { margin:0; padding:0; box-sizing:border-box; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    display:flex; justify-content:center; align-items:center; height:100vh;
 }
-
-/* Painel central */
 .panel {
-    background: #fff;
-    padding: 40px 50px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-    transition: all 0.3s ease;
+    background:#fff; padding:40px 50px; border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2); text-align:center;
+    width:90%; max-width:400px;
 }
-
-/* Título */
-.panel h1 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-}
-
-/* Status */
+.panel h1 { margin-bottom:20px; font-size:24px; color:#333; }
 .status {
-    font-weight: bold;
-    padding: 5px 15px;
-    border-radius: 20px;
-    color: #fff;
-    margin-left: 10px;
+    font-weight:bold; padding:5px 15px; border-radius:20px; color:#fff; margin-left:10px;
 }
-
-/* Botão toggle */
 button#toggleButton {
-    margin-top: 25px;
-    padding: 15px 30px;
-    font-size: 16px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background-color: #4CAF50;
-    color: #fff;
-    font-weight: bold;
+    margin-top:25px; padding:15px 30px; font-size:16px;
+    border:none; border-radius:50px; cursor:pointer;
+    transition:all 0.3s ease; background-color:#4CAF50; color:#fff; font-weight:bold;
 }
-
-button#toggleButton:hover {
-    background-color: #45a049;
-}
-
-/* Log de ações */
+button#toggleButton:hover { background-color:#45a049; }
 .log {
-    margin-top: 20px;
-    max-height: 150px;
-    overflow-y: auto;
-    text-align: left;
-    font-size: 14px;
-    color: #555;
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 10px;
+    margin-top:20px; max-height:150px; overflow-y:auto; text-align:left;
+    font-size:14px; color:#555; background:#f9f9f9; padding:10px; border-radius:10px;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
-
-/* Status ativo/desativado */
-.status.ativo {
-    background-color: #4CAF50;
-}
-
-.status.desativado {
-    background-color: #f44336;
-}
+.status.ativo { background-color: #4CAF50; }
+.status.desativado { background-color: #f44336; }
