@@ -114,4 +114,4 @@ async def toggle(request: Request):
 @app.get("/dashboard")
 async def serve_dashboard(request: Request):
     validar_auth(request)
-    return FileResponse("dashboard.html")
+    return FileResponse("index.html")
