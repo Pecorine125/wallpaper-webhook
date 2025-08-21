@@ -11,7 +11,7 @@ app = FastAPI()
 # -------------------------------
 # CONFIGURAÇÃO (Substitua pelo seu)
 # -------------------------------
-TOKEN = ""
+TOKEN = "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"
 REPO_OWNER = "Pecorine125"
 REPO_NAME = "WallpaperAnimes"
 
@@ -80,3 +80,4 @@ async def novo_wallpaper(request: Request):
         repo.create_file(repo_path, "Novo wallpaper", content)
 
     return {"status":"ok"}
+
