@@ -1,1 +1,6 @@
-
+fastapi
+requests
+Pillow
+PyGithub
+moviepy
+uvicorn
